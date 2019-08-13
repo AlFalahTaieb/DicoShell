@@ -5,37 +5,19 @@
 # Copyright (c) 2019, Taieb
 # All rights reserved.
 
+set -e
 
-grn='\e[1;32m'
-cyan='\e[0;36m'
-lcyan='\e[1;36m'
-lblue='\e[1;34m'
-pink='\e[35;1m'
-base_url="http://www.merriam-webster.com/dictionary/"
-checkInternet()
-{
-    echo -e "GET http://google.com HTTP/1.0\n\n" | nc google.com 80 > /dev/null 2>&1 # query google with a get request
-    if [ $? -eq 0 ]; then
-        echo "Working..."
-    else
-        echo "Error: no active internet connection" >&2
-        return 1
-    fi
-}
+KEYWORD=$1
 
-checkInternet || exit 1
+if [ -z "$KEYWORD" ]; then
+    echo "[e] Please enter a keyword as an argument!"
+    exit 1;
+fi
 
-enterWord()
-{
-    
-    read -p 'enter the word: ' word
-    echo $word
-	result=$(curl -sX GET --header "Accept: application/json" "https://www.yourdictionary.com/$word") > /dev/null 2>&1 #fetch results for input word
-	echo $result
-	dst=$(echo -n "$result" | sed -r "s/.*dst\" *: *\"([^\"]*).*/\1/g")
-    echo -e "$dst"
-    
-}
+if [ ! -x curl ] ; then
+    command -v curl >/dev/null 2>&1 || { echo >&2 "[e] Please install curl or set it in your path! \nFor debian, ubuntu and their derivative gnu/linux distributions run: \nsudo apt install curl"; exit 1; }
+fi
+
+curl dict.org/d:$KEYWORD:foldoc
 
 
-enterWord
